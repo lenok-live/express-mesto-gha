@@ -1,26 +1,34 @@
 const User = require('../models/user');
 
-function getUsers(req, res) {
+const NotFound = require('../errors/NotFound');
+const BadRequest = require('../errors/BadRequest');
+
+function getUsers(_req, res, next) {
   return User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .then((users) => res.send(users))
+    .catch(next);
 }
 
-function getUser(req, res) {
+function getUser(req, res, next) {
   const { userId } = req.params;
 
   return User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' });
-        return;
+        throw new NotFound('Запрашиваемый пользователь не найден');
       }
-      res.status(200).send(user);
+      res.send(user);
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Проблема со значениями идентификатора объекта.'));
+      }
+      next(err);
+    })
+    .catch(next);
 }
 
-function createUser(req, res) {
+function createUser(req, res, next) {
   const { name, about, avatar } = req.body;
 
   return User.create({ name, about, avatar })
@@ -34,18 +42,13 @@ function createUser(req, res) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({
-          message: `${Object.values(err.errors)
-            .map((error) => error.message)
-            .join(', ')}`,
-        });
-        return;
+        next(new BadRequest('Неподдерживаемый тип данных'));
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      next(err);
     });
 }
 
-function updateProfile(req, res) {
+function updateProfile(req, res, next) {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -55,15 +58,20 @@ function updateProfile(req, res) {
   )
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' });
-        return;
+        throw NotFound('Запрашиваемый пользователь не найден');
       }
-      res.status(200).send(user);
+      res.send(user);
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Проблема со значениями идентификатора объекта.'));
+      }
+      next(err);
+    })
+    .catch(next);
 }
 
-function updateAvatar(req, res) {
+function updateAvatar(req, res, next) {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -73,21 +81,15 @@ function updateAvatar(req, res) {
   )
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' });
-      } else {
-        res.send(user);
+        throw NotFound('Запрашиваемый пользователь не найден');
       }
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({
-          message: `${Object.values(err.errors)
-            .map((error) => error.message)
-            .join(', ')}`,
-        });
-        return;
+        next(new BadRequest('Неподдерживаемый тип данных'));
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      next(err);
     });
 }
 
