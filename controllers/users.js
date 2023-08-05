@@ -22,10 +22,10 @@ function getUser(req, res, next) {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Проблема со значениями идентификатора объекта.'));
+      } else {
+        next(err);
       }
-      next(err);
-    })
-    .catch(next);
+    });
 }
 
 function createUser(req, res, next) {
@@ -43,8 +43,9 @@ function createUser(req, res, next) {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Неподдерживаемый тип данных'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 }
 
@@ -63,12 +64,12 @@ function updateProfile(req, res, next) {
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequest('Проблема со значениями идентификатора объекта.'));
+      if (err.name === 'ValidationError') {
+        next(new BadRequest('Неподдерживаемый тип данных.'));
+      } else {
+        next(err);
       }
-      next(err);
-    })
-    .catch(next);
+    });
 }
 
 function updateAvatar(req, res, next) {
@@ -88,8 +89,9 @@ function updateAvatar(req, res, next) {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Неподдерживаемый тип данных'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 }
 

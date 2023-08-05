@@ -19,8 +19,9 @@ function createCard(req, res, next) {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Неподдерживаемый тип данных'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 }
 
@@ -42,10 +43,10 @@ function deleteCard(req, res, next) {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Проблема со значениями идентификатора объекта.'));
+      } else {
+        next(err);
       }
-      next(err);
-    })
-    .catch(next);
+    });
 }
 
 function likeCard(req, res, next) {
@@ -64,10 +65,10 @@ function likeCard(req, res, next) {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Проблема со значениями идентификатора объекта.'));
+      } else {
+        next(err);
       }
-      next(err);
-    })
-    .catch(next);
+    });
 }
 
 function dislikeCard(req, res, next) {
@@ -86,10 +87,10 @@ function dislikeCard(req, res, next) {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Проблема со значениями идентификатора объекта.'));
+      } else {
+        next(err);
       }
-      next(err);
-    })
-    .catch(next);
+    });
 }
 
 module.exports = {
