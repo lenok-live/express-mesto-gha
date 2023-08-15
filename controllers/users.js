@@ -1,7 +1,10 @@
-const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+const User = require('../models/user');
 const NotFound = require('../errors/NotFound');
 const BadRequest = require('../errors/BadRequest');
+const Conflict = require('../errors/Conflict');
 
 function getUsers(_req, res, next) {
   return User.find({})
@@ -29,19 +32,36 @@ function getUser(req, res, next) {
 }
 
 function createUser(req, res, next) {
-  const { name, about, avatar } = req.body;
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
 
-  return User.create({ name, about, avatar })
+  const hashPassword = bcrypt.hash(password, 10);
+
+  return User.create({
+    name,
+    about,
+    avatar,
+    email,
+    password: hashPassword,
+  })
     .then((user) => {
       res.status(201).send({
         _id: user._id,
         name: user.name,
         about: user.about,
         avatar: user.avatar,
+        email: user.email,
       });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.code === 11000) {
+        next(new Conflict('Данный email уже зарегистрирован'));
+      } else if (err.name === 'ValidationError') {
         next(new BadRequest('Неподдерживаемый тип данных'));
       } else {
         next(err);
@@ -95,10 +115,42 @@ function updateAvatar(req, res, next) {
     });
 }
 
+function login(req, res) {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then(() => {
+      const token = jwt.sign({ _id: 'd285e3dceed844f902650f40' }, 'super-secret-key', { expiresIn: '7days' });
+
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+}
+
+// контроллер для получения информации о пользователе
+function getUserInformation(req, res, next) {
+  const userId = req.user._id;
+
+  return User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        throw new NotFound('Запрашиваемый пользователь не найден');
+      } else {
+        res.send(user);
+      }
+    }).catch(next);
+}
+
 module.exports = {
   getUsers,
+  getUserInformation,
   getUser,
   createUser,
   updateProfile,
   updateAvatar,
+  login,
 };

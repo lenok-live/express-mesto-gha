@@ -32,6 +32,8 @@ function deleteCard(req, res, next) {
     .then((card) => {
       if (!card) {
         throw new NotFound('Нет карточки с таким id');
+      } if (card.owner.toString() !== req.body._id) {
+        res.status(403).send({ message: 'Доступ к удалению карточки других пользователей запрещен.' });
       } else {
         Card.deleteOne(card)
           .then(() => {
