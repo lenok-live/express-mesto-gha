@@ -8,13 +8,13 @@ const {
   updateAvatar,
 } = require('../controllers/users');
 
-const { updateProfileValidation, updateAvatarValidation } = require('../middleware/validation');
+const { updateProfileValidation, updateAvatarValidation, userIdValidation } = require('../middleware/validation');
 
 userRouter.get('/', getUsers); // возвращает всех пользователей
 
 userRouter.get('/me', getUserInformation); // возвращает информацию о текущем пользователе
 
-userRouter.get('/:userId', getUser); // возвращает пользователя по _id
+userRouter.get('/:userId', userIdValidation, getUser); // возвращает пользователя по _id
 
 userRouter.patch('/me', updateProfileValidation, updateProfile);
 

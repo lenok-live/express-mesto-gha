@@ -8,16 +8,16 @@ const {
   dislikeCard,
 } = require('../controllers/cards');
 
-const { createCardValidation } = require('../middleware/validation');
+const { createCardValidation, cardIdValidation } = require('../middleware/validation');
 
 cardRouter.get('/', getCards);
 
 cardRouter.post('/', createCardValidation, createCard);
 
-cardRouter.delete('/:cardId', deleteCard);
+cardRouter.delete('/:cardId', cardIdValidation, deleteCard);
 
-cardRouter.put('/:cardId/likes', likeCard); // поставить лайк карточке
+cardRouter.put('/:cardId/likes', cardIdValidation, likeCard); // поставить лайк карточке
 
-cardRouter.delete('/:cardId/likes', dislikeCard); // убрать лайк с карточки
+cardRouter.delete('/:cardId/likes', cardIdValidation, dislikeCard); // убрать лайк с карточки
 
 module.exports = cardRouter;

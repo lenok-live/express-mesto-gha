@@ -8,12 +8,12 @@ const NotFound = require('../errors/NotFound');
 const { login, createUser } = require('../controllers/users');
 const { loginValidation, registrationValidation } = require('../middleware/validation');
 
-const auth = require('../middleware/auth');
+// const auth = require('../middleware/auth');
 
 router.post('/signin', loginValidation, login);
 router.post('/signup', registrationValidation, createUser);
 
-router.use(auth);
+// router.use(auth);
 
 router.use('/users', userRouter);
 router.use('/cards', cardRouter);

@@ -2,6 +2,7 @@ const Card = require('../models/card');
 
 const NotFound = require('../errors/NotFound');
 const BadRequest = require('../errors/BadRequest');
+const Forbidden = require('../errors/Forbidden');
 
 function getCards(_req, res, next) {
   return Card.find({})
@@ -33,7 +34,7 @@ function deleteCard(req, res, next) {
       if (!card) {
         throw new NotFound('Нет карточки с таким id');
       } if (card.owner.toString() !== req.body._id) {
-        res.status(403).send({ message: 'Доступ к удалению карточки других пользователей запрещен.' });
+        throw new Forbidden('Доступ к удалению карточки других пользователей запрещен.');
       } else {
         Card.deleteOne(card)
           .then(() => {

@@ -114,7 +114,7 @@ function updateAvatar(req, res, next) {
     });
 }
 
-function login(req, res) {
+function login(req, res, next) {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -123,11 +123,7 @@ function login(req, res) {
 
       res.send({ token });
     })
-    .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch(next);
 }
 
 // контроллер для получения информации о пользователе

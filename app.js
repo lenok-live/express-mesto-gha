@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
+const { errors } = require('celebrate');
 
 const routes = require('./routes');
 
@@ -23,6 +24,7 @@ app.use(bodyParser.json()); // преобразует входные данны�
 
 app.use(routes);
 
+app.use(errors());
 app.use(errorMiddlewares);
 
 app.listen(PORT, () => {
