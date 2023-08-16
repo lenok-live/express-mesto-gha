@@ -31,7 +31,7 @@ function getUser(req, res, next) {
     });
 }
 
-function createUser(req, res, next) {
+async function createUser(req, res, next) {
   const {
     name,
     about,
@@ -40,33 +40,32 @@ function createUser(req, res, next) {
     password,
   } = req.body;
 
-  const hashPassword = bcrypt.hash(password, 10);
+  const hashPassword = await bcrypt.hash(password, 10);
 
-  return User.create({
-    name,
-    about,
-    avatar,
-    email,
-    password: hashPassword,
-  })
-    .then((user) => {
-      res.status(201).send({
-        _id: user._id,
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
-      });
-    })
-    .catch((err) => {
-      if (err.code === 11000) {
-        next(new Conflict('Данный email уже зарегистрирован'));
-      } else if (err.name === 'ValidationError') {
-        next(new BadRequest('Неподдерживаемый тип данных'));
-      } else {
-        next(err);
-      }
+  try {
+    const user = await User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hashPassword,
     });
+    res.status(201).send({
+      _id: user._id,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+    });
+  } catch (err) {
+    if (err.code === 11000) {
+      next(new Conflict('Данный email уже зарегистрирован'));
+    } else if (err.name === 'ValidationError') {
+      next(new BadRequest('Неподдерживаемый тип данных'));
+    } else {
+      next(err);
+    }
+  }
 }
 
 function updateProfile(req, res, next) {
@@ -119,8 +118,8 @@ function login(req, res) {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
-    .then(() => {
-      const token = jwt.sign({ _id: 'd285e3dceed844f902650f40' }, 'super-secret-key', { expiresIn: '7days' });
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'super-secret-key', { expiresIn: '7days' });
 
       res.send({ token });
     })

@@ -8,15 +8,17 @@ const {
   updateAvatar,
 } = require('../controllers/users');
 
+const { updateProfileValidation, updateAvatarValidation } = require('../middleware/validation');
+
 userRouter.get('/', getUsers); // возвращает всех пользователей
 
 userRouter.get('/me', getUserInformation); // возвращает информацию о текущем пользователе
 
 userRouter.get('/:userId', getUser); // возвращает пользователя по _id
 
-userRouter.patch('/me', updateProfile);
+userRouter.patch('/me', updateProfileValidation, updateProfile);
 
-userRouter.patch('/me/avatar', updateAvatar);
+userRouter.patch('/me/avatar', updateAvatarValidation, updateAvatar);
 
 module.exports = userRouter;
 

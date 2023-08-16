@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
-const pattern = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]{2,}(\.[a-zA-Z0-9]{2,})(\.[a-zA-Z0-9#]{1,})?/;
+const pattern = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=]{2,}(\.[a-zA-Z0-9]{2,})(\.[a-zA-Z0-9?#]{2,})/;
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -36,7 +36,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8,
     select: false,
   },
 });
