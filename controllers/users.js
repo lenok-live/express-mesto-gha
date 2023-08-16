@@ -63,11 +63,12 @@ function createUser(req, res, next) {
       });
     })
     .catch((err) => {
+      if (err.code === 11000) {
+        next(new Conflict('Данный email уже зарегистрирован'));
+        return;
+      }
       if (err.name === 'ValidationError') {
         next(new BadRequest('Неподдерживаемый тип данных'));
-        return;
-      } if (err.code === 11000) {
-        next(new Conflict('Данный email уже зарегистрирован'));
         return;
       }
       next(err);
