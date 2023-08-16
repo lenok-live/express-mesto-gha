@@ -126,7 +126,7 @@ function login(req, res, next) {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'super-secret-key', { expiresIn: '7days' });
+      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7days' });
 
       res.send({ token });
     })

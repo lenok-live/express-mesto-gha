@@ -6,17 +6,16 @@ const Forbidden = require('../errors/Forbidden');
 
 function getCards(_req, res, next) {
   return Card.find({})
-    .then((cards) => res.send(cards))
+    .then((cards) => res.send(cards)) // 2
     .catch(next);
 }
 
 function createCard(req, res, next) {
-  // console.log(req.user._id);
   const { name, link } = req.body;
   const owner = req.user._id;
 
   return Card.create({ name, link, owner })
-    .then((card) => res.status(201).send(card))
+    .then((card) => { res.status(201).send(card); }) // 1
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Неподдерживаемый тип данных'));
@@ -33,7 +32,8 @@ function deleteCard(req, res, next) {
     .then((card) => {
       if (!card) {
         throw new NotFound('Нет карточки с таким id');
-      } if (card.owner.toString() !== req.body._id) {
+      }
+      if (card.owner.toString() !== req.body._id) {
         throw new Forbidden('Доступ к удалению карточки других пользователей запрещен.');
       } else {
         Card.deleteOne(card)

@@ -5,11 +5,11 @@ const Unauthorized = require('../errors/Unauthorized');
 //   return header.replace('Bearer ', '');
 // };
 
-module.exports = (req, res, next) => {
+const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    throw new Unauthorized('Необходима авторизация');
+    return next(new Unauthorized('Необходима авторизация'));
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -20,10 +20,13 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(token, 'super-strong-secret');
   } catch (err) {
     // отправим ошибку, если не получилось
-    throw new Unauthorized('Необходима авторизация');
+    return next(new Unauthorized('Необходима авторизация'));
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
 
   next(); // пропускаем запрос дальше
+  return null;
 };
+
+module.exports = auth;
