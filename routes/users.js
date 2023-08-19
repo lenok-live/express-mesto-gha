@@ -8,7 +8,7 @@ const {
   updateAvatar,
 } = require('../controllers/users');
 
-const { updateProfileValidation, updateAvatarValidation, userIdValidation } = require('../middleware/validation');
+const { updateProfileValidation, updateAvatarValidation, userIdValidation } = require('../middlewares/validation');
 
 userRouter.get('/', getUsers); // возвращает всех пользователей
 

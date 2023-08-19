@@ -6,9 +6,9 @@ const cardRouter = require('./cards');
 const NotFound = require('../errors/NotFound');
 
 const { login, createUser } = require('../controllers/users');
-const { loginValidation, registrationValidation } = require('../middleware/validation');
+const { loginValidation, registrationValidation } = require('../middlewares/validation');
 
-const auth = require('../middleware/auth');
+const auth = require('../middlewares/auth');
 
 router.post('/signin', loginValidation, login);
 router.post('/signup', registrationValidation, createUser);
